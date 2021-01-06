@@ -4,7 +4,9 @@ import { useState } from 'preact/hooks';
 import Loading from 'components/loading';
 
 const RemoteSupportPage = () => {
-	const {data: session} = useSession();
+	const {data: sessionData} = useSession();
+	const session = sessionData && sessionData.session || null;
+
 	const [consoleViewable, setConsoleViewable] = useState(false);
 	const [openSession, openStatus] = useOpenSession();
 	const [closeSession] = useCloseSession();
@@ -15,18 +17,19 @@ const RemoteSupportPage = () => {
 
 
 export const RemoteSupportPage_ = ({session, consoleViewable=false, remoteHostAccesible=true, isOpening=false, onOpenSession, onConsoleViewToggle, onCloseSession}) => {
+	const sessionAvailable = session && Object.keys(session).length > 0
 	return <div>
 		{!remoteHostAccesible &&
 			<div> El host remoto está inaccesible, verifique la conexión con la internet para usar esta funcionalidad. </div>}
 		{remoteHostAccesible && 
 			<div> Hay conexión a internet, puede usar esta funcionalidad.</div>}
-		{!session && remoteHostAccesible &&
+		{!sessionAvailable && remoteHostAccesible &&
 			<div>
 				No hay sesion abierta.
 				<button onClick={onOpenSession}>Crear sesion</button>
 			</div>
 		}
-		{session && remoteHostAccesible && !consoleViewable &&
+		{sessionAvailable && remoteHostAccesible && !consoleViewable &&
 			<div>
 				Sesión abierta.<br/>
 				Consola interactiva.
@@ -36,7 +39,7 @@ export const RemoteSupportPage_ = ({session, consoleViewable=false, remoteHostAc
 				<button onClick={onCloseSession}>Cerrar sesion</button>
 			</div>
 		}
-		{session && remoteHostAccesible && consoleViewable &&
+		{sessionAvailable && remoteHostAccesible && consoleViewable &&
 			<div>
 				<button onClick={onConsoleViewToggle}>Cerrar ventana</button>
 				<button onClick={onCloseSession}>Cerrar sesion</button>
